@@ -1,5 +1,6 @@
 package com.booking.eventbookingservice.auth.service;
 
+import com.booking.eventbookingservice.auth.dto.LoginRequest;
 import com.booking.eventbookingservice.auth.dto.RegisterRequest;
 import com.booking.eventbookingservice.auth.entity.Role;
 import com.booking.eventbookingservice.auth.entity.User;
@@ -30,4 +31,18 @@ public class AuthService {
 
         userRepository.save(user);
     }
+
+    public String login(LoginRequest request) {
+
+        var user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new RuntimeException("Invalid email or password"));
+
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new RuntimeException("Invalid email or password");
+        }
+
+        // Temporary return — JWT comes next step
+        return "OK";
+    }
+
 }

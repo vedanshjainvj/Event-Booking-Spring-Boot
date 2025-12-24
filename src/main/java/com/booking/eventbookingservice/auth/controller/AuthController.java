@@ -1,5 +1,6 @@
 package com.booking.eventbookingservice.auth.controller;
 
+import com.booking.eventbookingservice.auth.dto.LoginRequest;
 import com.booking.eventbookingservice.auth.dto.RegisterRequest;
 import com.booking.eventbookingservice.auth.service.AuthService;
 import com.booking.eventbookingservice.common.ApiResponse;
@@ -29,5 +30,20 @@ public class AuthController {
                         .build()
         );
 
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<ApiResponse<?>> login(@Valid @RequestBody LoginRequest request) {
+
+        String result = authService.login(request);
+
+        return ResponseEntity.ok(
+                ApiResponse.builder()
+                        .success(true)
+                        .message("Login successful")
+                        .data(result)
+                        .timestamp(Instant.now())
+                        .build()
+        );
     }
 }
