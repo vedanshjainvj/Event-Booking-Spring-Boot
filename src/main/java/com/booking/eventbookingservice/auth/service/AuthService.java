@@ -9,12 +9,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
+
 @Service
 @RequiredArgsConstructor
 public class AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
     public void register(RegisterRequest request) {
 
@@ -41,8 +44,10 @@ public class AuthService {
             throw new RuntimeException("Invalid email or password");
         }
 
-        // Temporary return — JWT comes next step
-        return "OK";
+        return jwtService.generateToken(
+                user.getEmail(),
+                Map.of("role", user.getRole().name())
+        );
     }
 
 }

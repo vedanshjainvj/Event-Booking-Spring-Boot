@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 
 import java.time.Instant;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -35,13 +36,13 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<?>> login(@Valid @RequestBody LoginRequest request) {
 
-        String result = authService.login(request);
+        String token = authService.login(request);
 
         return ResponseEntity.ok(
                 ApiResponse.builder()
                         .success(true)
                         .message("Login successful")
-                        .data(result)
+                        .data(Map.of("accessToken", token))
                         .timestamp(Instant.now())
                         .build()
         );
