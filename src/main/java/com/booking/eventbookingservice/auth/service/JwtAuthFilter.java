@@ -1,7 +1,6 @@
 package com.booking.eventbookingservice.auth.service;
 
 import com.booking.eventbookingservice.auth.repository.UserRepository;
-import com.booking.eventbookingservice.auth.service.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -40,7 +39,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         final String token = header.substring(7);
 
         if (!jwtService.isTokenValid(token)) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            filterChain.doFilter(request, response);
             return;
         }
 
@@ -48,16 +47,22 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         var user = userRepository.findByEmail(email).orElse(null);
         if (user == null) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            filterChain.doFilter(request, response);
             return;
         }
 
-        var authUser = new User(user.getEmail(), user.getPassword(), Collections.emptyList());
+        String role = jwtService.extractRole(token);
+
+        var authorities = Collections.singletonList(
+                new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_" + role)
+        );
+
+        var authUser = new User(user.getEmail(), user.getPassword(), authorities);
 
         var authToken = new UsernamePasswordAuthenticationToken(
                 authUser,
                 null,
-                authUser.getAuthorities()
+                authorities
         );
 
         authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
