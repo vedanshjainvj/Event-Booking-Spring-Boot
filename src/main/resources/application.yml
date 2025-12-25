@@ -24,8 +24,13 @@ spring:
   kafka:
     bootstrap-servers: localhost:9092
 
+
 logging:
   level:
     org.springframework.security: INFO
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql: TRACE
+
+jwt:
+  secret: "Jnivjneirnveijvnkeuufn7w4hf8437fnrwen3w4unf848nvsdweunweivbeqifjvnwijrnvi"
+  expiration: 7200000
