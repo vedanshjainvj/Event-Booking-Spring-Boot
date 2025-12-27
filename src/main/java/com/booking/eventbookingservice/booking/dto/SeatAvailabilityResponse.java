@@ -5,9 +5,11 @@ import com.booking.eventbookingservice.seat.entity.SeatCategory;
 import lombok.Builder;
 import lombok.Data;
 
+import java.io.Serializable;
+
 @Data
 @Builder
-public class SeatAvailabilityResponse {
+public class SeatAvailabilityResponse  implements Serializable {
 
     private Long seatId;
     private String rowLabel;

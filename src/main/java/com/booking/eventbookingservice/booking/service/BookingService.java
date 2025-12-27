@@ -9,11 +9,13 @@ import com.booking.eventbookingservice.booking.repository.ShowSeatStatusReposito
 import com.booking.eventbookingservice.show.repository.ShowRepository;
 import com.booking.eventbookingservice.seat.repository.SeatRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.booking.eventbookingservice.booking.dto.SeatAvailabilityResponse;
 import com.booking.eventbookingservice.booking.entity.SeatState;
+import org.springframework.cache.annotation.Cacheable;
 
 import java.time.Instant;
 import java.util.List;
@@ -29,7 +31,9 @@ public class BookingService {
     private final UserRepository userRepository;
 
     @Transactional
+    @CacheEvict(value = "showAvailability", key = "#request.showId")
     public BookingResponse book(CreateBookingRequest request){
+
 
         var authUser = SecurityContextHolder.getContext().getAuthentication().getName();
 
@@ -85,6 +89,10 @@ public class BookingService {
                 .build();
     }
 
+    @Cacheable(
+            value = "showAvailability",
+            key = "#showId"
+    )
     public List<SeatAvailabilityResponse> getAvailability(Long showId){
 
         var show = showRepository.findById(showId)
