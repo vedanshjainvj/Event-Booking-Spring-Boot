@@ -23,4 +23,5 @@ public class Venue {
     private String city;
 
     private String address;
+
 }
