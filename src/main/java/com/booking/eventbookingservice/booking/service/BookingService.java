@@ -4,6 +4,8 @@ import com.booking.eventbookingservice.auth.repository.UserRepository;
 import com.booking.eventbookingservice.booking.dto.CreateBookingRequest;
 import com.booking.eventbookingservice.booking.dto.BookingResponse;
 import com.booking.eventbookingservice.booking.entity.*;
+import com.booking.eventbookingservice.booking.event.BookingConfirmedEvent;
+import com.booking.eventbookingservice.booking.event.BookingEventProducer;
 import com.booking.eventbookingservice.booking.repository.BookingRepository;
 import com.booking.eventbookingservice.booking.repository.ShowSeatStatusRepository;
 import com.booking.eventbookingservice.show.repository.ShowRepository;
@@ -29,6 +31,7 @@ public class BookingService {
     private final SeatRepository seatRepository;
     private final ShowSeatStatusRepository statusRepository;
     private final UserRepository userRepository;
+    private final BookingEventProducer bookingEventProducer;
 
     @Transactional
     @CacheEvict(value = "showAvailability", key = "#request.showId")
@@ -79,6 +82,16 @@ public class BookingService {
                 .build();
 
         var saved = bookingRepository.save(booking);
+
+        var event = BookingConfirmedEvent.builder()
+                .bookingId(saved.getId())
+                .userId(user.getId())
+                .showId(show.getId())
+                .seatIds(saved.getSeatIds())
+                .timestamp(saved.getCreatedAt())
+                .build();
+
+        bookingEventProducer.publishBookingConfirmed(event);
 
         return BookingResponse.builder()
                 .bookingId(saved.getId())
