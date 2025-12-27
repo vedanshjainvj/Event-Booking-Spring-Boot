@@ -8,7 +8,7 @@ import com.booking.eventbookingservice.show.repository.ShowRepository;
 import com.booking.eventbookingservice.venue.repository.AuditoriumRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
+import org.springframework.cache.annotation.Cacheable;
 import java.util.List;
 
 @Service
@@ -49,6 +49,7 @@ public class ShowService {
                 .build();
     }
 
+    @Cacheable(value = "eventShows", key = "#eventId")
     public List<ShowResponse> getByEvent(Long eventId){
         return showRepository.findByEventId(eventId)
                 .stream()

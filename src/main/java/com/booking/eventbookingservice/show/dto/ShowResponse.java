@@ -2,12 +2,13 @@ package com.booking.eventbookingservice.show.dto;
 
 import lombok.Builder;
 import lombok.Data;
-
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Data
 @Builder
-public class ShowResponse {
+public class ShowResponse implements Serializable {
+
     private Long id;
     private Long eventId;
     private String eventTitle;
