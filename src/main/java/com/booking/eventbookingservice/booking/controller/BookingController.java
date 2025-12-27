@@ -30,4 +30,20 @@ public class BookingController {
                         .build()
         );
     }
+
+    @GetMapping("/availability/{showId}")
+    public ResponseEntity<ApiResponse<?>> availability(@PathVariable Long showId){
+
+        var res = bookingService.getAvailability(showId);
+
+        return ResponseEntity.ok(
+                ApiResponse.builder()
+                        .success(true)
+                        .message("Seat availability fetched")
+                        .data(res)
+                        .timestamp(Instant.now())
+                        .build()
+        );
+    }
+
 }

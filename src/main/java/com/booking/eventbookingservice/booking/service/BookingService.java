@@ -12,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.booking.eventbookingservice.booking.dto.SeatAvailabilityResponse;
+import com.booking.eventbookingservice.booking.entity.SeatState;
 
 import java.time.Instant;
 import java.util.List;
@@ -82,4 +84,38 @@ public class BookingService {
                 .createdAt(saved.getCreatedAt())
                 .build();
     }
+
+    public List<SeatAvailabilityResponse> getAvailability(Long showId){
+
+        var show = showRepository.findById(showId)
+                .orElseThrow(() -> new RuntimeException("Show not found"));
+
+        var auditoriumId = show.getAuditorium().getId();
+
+        var seats = seatRepository.findByAuditoriumId(auditoriumId);
+
+        var booked = statusRepository
+                .findByShowIdAndSeatIdIn(
+                        showId,
+                        seats.stream().map(s -> s.getId()).toList()
+                )
+                .stream()
+                .map(s -> s.getSeat().getId())
+                .toList();
+
+        return seats.stream().map(seat ->
+                SeatAvailabilityResponse.builder()
+                        .seatId(seat.getId())
+                        .rowLabel(seat.getRowLabel())
+                        .seatNumber(seat.getSeatNumber())
+                        .category(seat.getCategory())
+                        .state(
+                                booked.contains(seat.getId())
+                                        ? SeatState.BOOKED
+                                        : SeatState.AVAILABLE
+                        )
+                        .build()
+        ).toList();
+    }
+
 }
