@@ -3,6 +3,7 @@ package com.booking.eventbookingservice.auth.service;
 import com.booking.eventbookingservice.auth.entity.RefreshToken;
 import com.booking.eventbookingservice.auth.repository.RefreshTokenRepository;
 import com.booking.eventbookingservice.auth.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +19,7 @@ public class RefreshTokenService {
 
     private final long REFRESH_TOKEN_VALIDITY_MS = 1000L * 60 * 60 * 24 * 7;  // 7 days
 
+    @Transactional
     public RefreshToken createRefreshToken(Long userId) {
 
         refreshTokenRepository.deleteByUser_Id(userId);
@@ -34,6 +36,7 @@ public class RefreshTokenService {
         return refreshTokenRepository.save(token);
     }
 
+    @Transactional
     public RefreshToken validateRefreshToken(String token) {
 
         var refreshToken = refreshTokenRepository.findByToken(token)
