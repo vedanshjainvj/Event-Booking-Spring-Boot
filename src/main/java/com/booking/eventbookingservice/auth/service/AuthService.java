@@ -18,6 +18,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final RefreshTokenService refreshTokenService;
 
     public void register(RegisterRequest request) {
 
@@ -35,18 +36,24 @@ public class AuthService {
         userRepository.save(user);
     }
 
-    public String login(LoginRequest request) {
+    public Map<String, Object> login(LoginRequest request) {
 
         var user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("Invalid email or password"));
+                .orElseThrow(() -> new RuntimeException("Invalid credentials"));
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new RuntimeException("Invalid email or password");
+            throw new RuntimeException("Invalid credentials");
         }
 
-        return jwtService.generateToken(
+        String accessToken = jwtService.generateToken(
                 user.getEmail(),
                 Map.of("role", user.getRole().name())
+        );
+        var refreshToken = refreshTokenService.createRefreshToken(user.getId());
+
+        return Map.of(
+                "accessToken", accessToken,
+                "refreshToken", refreshToken.getToken()
         );
     }
 
