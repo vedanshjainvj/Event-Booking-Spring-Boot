@@ -4,6 +4,7 @@ server:
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5433/booking-db
+#    url: jdbc:postgresql://postgres:5433/booking-db
     username: booking_user
     password: booking_pass
     driver-class-name: org.postgresql.Driver
@@ -23,6 +24,7 @@ spring:
 
   kafka:
     bootstrap-servers: localhost:9092
+#   bootstrap-servers: kafka:9092
 
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
@@ -45,7 +47,6 @@ spring:
         spring.json.use.type.headers: false
         spring.json.value.default.type: com.booking.eventbookingservice.booking.event.BookingConfirmedEvent
 
-        # Add type mappings if you have multiple event types
         spring.json.type.mapping: bookingConfirmed:com.booking.eventbookingservice.booking.event.BookingConfirmedEvent
 
 logging:
